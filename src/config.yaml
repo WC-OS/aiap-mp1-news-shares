@@ -1,0 +1,44 @@
+# All settings for the pipeline live here, so nothing is hard-coded in the scripts.
+
+file_path: "./data/data.csv"
+target_column: "shares"
+
+# Split: 80% train, 10% validation, 10% test
+test_size: 0.1
+val_size: 0.1
+random_state: 42
+cv_folds: 3
+
+# Labels, not clues
+id_columns: ["ID", "URL"]
+
+# 58% of rows hold a -1 placeholder and the column shows no link to shares
+columns_to_drop: ["kw_min_min"]
+
+# Only known after an article is published (see README, "Two scenarios")
+post_publication_columns: ["n_comments"]
+
+# Blank here means "not recorded", so fill with 0 and add a flag column
+flag_missing_columns: ["num_videos"]
+
+# Share counts cannot be negative. Negatives come from the same -1 placeholder.
+clip_at_zero_columns: ["kw_avg_min", "kw_min_avg"]
+
+categorical_features: ["weekday", "data_channel"]
+missing_category_label: "no_topic"
+
+# Settings to try for each model. GridSearchCV picks the best one.
+param_grids:
+  ridge:
+    regressor__alpha: [0.1, 1, 10, 100, 1000]
+  lasso:
+    regressor__alpha: [0.0001, 0.001, 0.01, 0.1]
+  decision_tree:
+    regressor__max_depth: [3, 5, 7, 10]
+    regressor__min_samples_leaf: [20, 50, 100]
+  random_forest:
+    regressor__min_samples_leaf: [20, 50]
+
+random_forest:
+  n_estimators: 200
+  max_features: 0.5
